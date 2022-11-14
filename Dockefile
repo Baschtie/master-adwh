@@ -1,5 +1,7 @@
 FROM postgres
 
+LABEL org.opencontainers.image.source https://github.com/baschtie/master-adwh
+
 ENV POSTGRES_PASSWORD=secret
 ENV POSTGRES_USER=postgres
 ENV POSTGRES_DB=postgres

@@ -146,3 +146,35 @@ create table favors
         constraint favors_policies_null_fk
             references policies (id)
 );
+
+-- VIEWS
+create view star_revenue as (
+    select pg.id as "ProduktGruppeID",
+        c.id as "KundenID",
+        p.id as "ProduktID",
+        a.id as "MarklerID",
+        sum(a.commission + (p.base_price * policies.discount)) as "Umsatz",
+        DATE(policies.vaild_to) as "Tag"
+    FROM policies
+    INNER JOIN customer c on c.id = policies.customer_id
+    INNER JOIN products p on p.id = policies.product_id
+    INNER JOIN product_groups pg on pg.id = p.product_groups_id
+    INNER JOIN mediations m on policies.id = m.policy_id
+    INNER JOIN agents a on m.agent_id = a.id
+
+    GROUP BY pg.id, c.id, p.id, a.id, DATE(policies.vaild_to)
+); --TODO check if that makes sense
+
+create view snow_revenue as (
+    select policies.id as "PoliceID",
+        sum(a.commission + (p.base_price * policies.discount)) as "Umsatz",
+        DATE(policies.vaild_to) as "Tag"
+    FROM policies
+    INNER JOIN customer c on c.id = policies.customer_id
+    INNER JOIN products p on p.id = policies.product_id
+    INNER JOIN product_groups pg on pg.id = p.product_groups_id
+    INNER JOIN mediations m on policies.id = m.policy_id
+    INNER JOIN agents a on m.agent_id = a.id
+
+    GROUP BY policies.id, DATE(policies.vaild_to)
+); --TODO prob. switch to agent/ group or product
